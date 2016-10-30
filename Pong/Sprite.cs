@@ -17,7 +17,8 @@ namespace Pong
         /// <summary >
         /// Represents the texture of the Sprite on the screen .
         /// Texture2D is a type defined in Monogame framework .
-        /// </ summary >        public Texture2D Texture { get; set; }
+        /// </ summary >
+        public Texture2D Texture { get; set; }
         protected Sprite(int width, int height, float x = 0, float y = 0)
         {
             X = x;
@@ -32,6 +33,7 @@ namespace Pong
         {
             spriteBatch.Draw(Texture, new Vector2(X, Y), new Rectangle(0, 0,
             Width, Height), Color.White);
-        }
+        }
+
     }
 }

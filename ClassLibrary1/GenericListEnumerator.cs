@@ -1,6 +1,7 @@
 ﻿using ClassLibrary1;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ClassLibrary1
 {
@@ -25,6 +26,7 @@ namespace ClassLibrary1
             {
                 return false;
             }
+            _current++;
             return true;
         }
 

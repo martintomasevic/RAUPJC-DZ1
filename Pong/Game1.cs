@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using ClassLibrary1;
 
 namespace Pong
 {
@@ -12,9 +15,43 @@ namespace Pong
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        /// <summary >
+        /// Bottom paddle object
+        /// </ summary >
+        public Paddle PaddleBottom { get; private set; }
+        /// <summary >
+        /// Top paddle object
+        /// </ summary >
+        public Paddle PaddleTop { get; private set; }
+        /// <summary >
+        /// Ball object
+        /// </ summary >
+        public Ball Ball { get; private set; }
+        /// <summary >
+        /// Background image
+        /// </ summary >
+        public Background Background { get; private set; }
+        /// <summary >
+        /// Sound when ball hits an obstacle .
+        /// SoundEffect is a type defined in Monogame framework
+        /// </ summary >
+        public SoundEffect HitSound { get; private set; }
+        /// <summary >
+        /// Background music . Song is a type defined in Monogame framework
+        /// </ summary >
+        public Song Music { get; private set; }
+        /// <summary >
+        /// Generic list that holds Sprites that should be drawn on screen
+        /// </ summary >
+        private IGenericList<Sprite> SpritesForDrawList = new GenericList<Sprite>();
+
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferHeight = 900,
+                PreferredBackBufferWidth = 500
+            };
             Content.RootDirectory = "Content";
         }
 
@@ -26,7 +63,34 @@ namespace Pong
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            // Screen bounds details . Use this information to set up game objects positions.
+            var screenBounds = GraphicsDevice.Viewport.Bounds;
+            PaddleBottom = new Paddle(GameConstants.PaddleDefaultWidth,
+            GameConstants.PaddleDefaulHeight, GameConstants.PaddleDefaulSpeed);
+            //PaddleBottom.X = < PaddleBottom X Position >;
+            //PaddleBottom.Y = < PaddleBottom Y Position >;
+            PaddleBottom.X = 0;
+            PaddleBottom.Y = 0;
+            PaddleTop = new Paddle(GameConstants.PaddleDefaultWidth,
+            GameConstants.PaddleDefaulHeight, GameConstants.PaddleDefaulSpeed);
+            //PaddleTop.X = < PaddleTop X Position >;
+            //PaddleTop.Y = < PaddleTop Y Position >;
+            Ball = new Ball(GameConstants.DefaultBallSize,
+            GameConstants.DefaultInitialBallSpeed,
+            GameConstants.DefaultBallBumpSpeedIncreaseFactor)
+            {
+                //X = < Ball center X Position >
+                //Y = < Ball center Y Position >
+                X = 10,
+                Y = 10
+            };
+            //Background = new Background( < width of the screen bounds > , < height of the screen bounds >);
+            Background = new Background(200, 300);
+            // Add our game objects to the sprites that should be drawn collection .. you ’ll see why in a second
+            SpritesForDrawList.Add(Background);
+            SpritesForDrawList.Add(PaddleBottom);
+            SpritesForDrawList.Add(PaddleTop);
+            SpritesForDrawList.Add(Ball);
 
             base.Initialize();
         }
@@ -37,10 +101,20 @@ namespace Pong
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
+            // Initialize new SpriteBatch object which will be used to draw textures .
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            // Set textures
+            Texture2D paddleTexture = Content.Load<Texture2D>("paddle");
+            PaddleBottom.Texture = paddleTexture;
+            PaddleTop.Texture = paddleTexture;
+            Ball.Texture = Content.Load<Texture2D>("ball");
+            Background.Texture = Content.Load<Texture2D>("background");
+            // Load sounds
+            // Start background music
+            HitSound = Content.Load<SoundEffect>("hit");
+            Music = Content.Load<Song>("music");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(Music);
         }
 
         /// <summary>
@@ -73,9 +147,15 @@ namespace Pong
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+            // Start drawing .
+            spriteBatch.Begin();
+            for (int i = 0; i < SpritesForDrawList.Count; i++)
+            {
+                SpritesForDrawList.GetElement(i).DrawSpriteOnScreen(spriteBatch);
+            }
+            // End drawing .
+            // Send all gathered details to the graphic card in one batch .
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

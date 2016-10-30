@@ -73,8 +73,11 @@ namespace ClassLibrary1
             int position = -1;
             for (int i = 0; i < Count; i++)
             {
-                if (_internalStorage[i].Equals(item)) position = i;
-                break;
+                if (_internalStorage[i].Equals(item))
+                {
+                    position = i;
+                    break;
+                }
             }
             return position;
         }
